@@ -1,7 +1,17 @@
+from dataclasses import dataclass
 import os
 from typing import Iterable, List, Union
 from openai import OpenAI
-import math
+from openai.types.embedding import Embedding
+
+@dataclass
+class BatchedEmbeddings:
+    batch_number: int
+    embeddings: List[Embedding]
+
+    def __init__(self, batch_number: int, embeddings: List[Embedding]):
+        self.batch_number = batch_number
+        self.embeddings = embeddings
 
 class AiClient:
     def __init__(self):
@@ -22,14 +32,14 @@ class AiClient:
         return self.ai.embeddings.create(model=model, input=input)
 
     def batchCreateEmbeddings(self, model: str, batch_size: int, input: List[str]):
-        batched_embeddings = []
+        batched_embeddings: List[BatchedEmbeddings] = []
         batch_number = 0
 
         for i in range(0, len(input), batch_size):
             print(f"create embeddings for batch: {batch_number}")
             print(len(input[i:i+batch_size]))
-            embeddings = self.ai.embeddings.create(model=model, input=input[i:i + batch_size])
-            batched_embeddings.append({'batch_number': batch_number, 'payload': embeddings})
+            res = self.ai.embeddings.create(model=model, input=input[i:i + batch_size])
+            batched_embeddings.append(BatchedEmbeddings(batch_number, res.data))
             batch_number += 1
 
         return batched_embeddings
