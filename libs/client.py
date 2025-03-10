@@ -3,6 +3,7 @@ import os
 from typing import Iterable, List, Union
 from openai import OpenAI
 from openai.types.embedding import Embedding
+from dashscope import MultiModalConversation
 
 @dataclass
 class BatchedEmbeddings:
@@ -43,3 +44,13 @@ class AiClient:
             batch_number += 1
 
         return batched_embeddings
+
+    def transcribe(self, file_path: str):
+        messages = [
+            {
+                "role": "user",
+                "content": [{"audio": file_path}],
+            }
+        ]
+        res = MultiModalConversation.call(model="qwen-audio-asr", messages=messages, api_key=os.getenv("DASHSCOPE_API_KEY"))
+        return res.output.choices[0].message.content[0].get('text')
