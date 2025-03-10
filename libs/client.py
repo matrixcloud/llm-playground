@@ -4,6 +4,8 @@ from typing import Iterable, List, Union
 from openai import OpenAI
 from openai.types.embedding import Embedding
 from dashscope import MultiModalConversation
+from openai.types.chat.completion_create_params import ResponseFormat
+from openai import NOT_GIVEN, NotGiven
 
 @dataclass
 class BatchedEmbeddings:
@@ -22,12 +24,16 @@ class AiClient:
             base_url = "https://dashscope.aliyuncs.com/compatible-mode/v1"
         )
 
-    def ask(self, messages: List[str]):
+    def ask(self, messages: List[str],response_format: ResponseFormat | NotGiven = NOT_GIVEN, model: str = "deepseek-v3"):
         res = self.ai.chat.completions.create(
-            model="deepseek-r1",  # 此处以 deepseek-r1 为例，可按需更换模型名称。
-            messages=messages
+            model=model,  # 此处以 deepseek-r1 为例，可按需更换模型名称。
+            messages=messages,
+            response_format=response_format
         )
         return res.choices[0].message.content
+
+    def complete(self, content: str, response_format: ResponseFormat | NotGiven = NOT_GIVEN, model: str = "deepseek-v3"):
+        return self.ask([{"role": "user", "content": content}], response_format=response_format, model=model)
 
     def createEmbeddings(self, model: str, input: Union[str, List[str], Iterable[int], Iterable[Iterable[int]]]):
         return self.ai.embeddings.create(model=model, input=input)
