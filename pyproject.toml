@@ -1,0 +1,19 @@
+[project]
+name = "llm-playground"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "dashscope>=1.22.2",
+    "gradio>=5.22.0",
+    "langchain>=0.3.21",
+    "langchain-community>=0.3.20",
+    "openai>=1.67.0",
+    "oss2>=2.19.1",
+    "pypdf>=5.4.0",
+    "redis>=5.2.1",
+]
+[[tool.uv.index]]
+url = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple"
+default = true
